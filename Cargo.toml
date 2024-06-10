@@ -1,0 +1,10 @@
+[package]
+name = "cadastral_map"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+geo = "0.28.0"
+geojson = "0.24.1"
+plotters = "0.3.6"
+serde_json = "1.0.117"
