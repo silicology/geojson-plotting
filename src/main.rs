@@ -67,15 +67,28 @@ fn match_geometry(geom: &Geometry, root: &DrawingArea<SVGBackend, Shift>) {
 fn draw_polygon(coordinates: &Vec<Vec<Vec<f64>>>, root: &DrawingArea<SVGBackend, Shift>) {
     let polygon = coordinates[0]
         .iter()
-        .map(|coord| (coord[0] as i32 * 10, coord[1] as i32 * 10))
+        .map(|coord| {
+            (
+                (coord[0] * 100.0 + 512.0) as i32,
+                (coord[1] * 100.0 + 384.0) as i32,
+            )
+        })
         .collect::<Vec<_>>();
-    root.draw(&Polygon::new(polygon, &GREEN)).unwrap();
+    let style = ShapeStyle {
+        color: GREEN.mix(0.1).to_rgba(),
+        filled: true,
+        stroke_width: 1,
+    };
+    root.draw(&Polygon::new(polygon, style)).unwrap();
 }
 
 /// Draw a Point
 fn draw_point(coordinates: &Vec<f64>, root: &DrawingArea<SVGBackend, Shift>) {
     root.draw(&Circle::new(
-        (coordinates[0] as i32 * 10, coordinates[1] as i32 * 10),
+        (
+            (coordinates[0] * 100.0 + 512.0) as i32,
+            (coordinates[1] * 100.0 + 384.0) as i32,
+        ),
         5,
         ShapeStyle {
             color: YELLOW.to_rgba(),
@@ -90,13 +103,18 @@ fn draw_point(coordinates: &Vec<f64>, root: &DrawingArea<SVGBackend, Shift>) {
 fn draw_linestring(coordinates: &Vec<Vec<f64>>, root: &DrawingArea<SVGBackend, Shift>) {
     let linestring = coordinates
         .iter()
-        .map(|coord| (coord[0] as i32 * 10, coord[1] as i32 * 10))
+        .map(|coord| {
+            (
+                (coord[0] * 100.0 + 512.0) as i32,
+                (coord[1] * 100.0 + 384.0) as i32,
+            )
+        })
         .collect::<Vec<_>>();
     root.draw(&PathElement::new(linestring, &BLUE)).unwrap();
 }
 
 fn main() {
-    let geojson_data = std::fs::read_to_string("data/data.geojson").unwrap();
+    let geojson_data = std::fs::read_to_string("data/data2.geojson").unwrap();
     let geojson = geojson_data.parse::<GeoJson>().unwrap();
 
     let root = SVGBackend::new("plot.svg", (1024, 768)).into_drawing_area();
@@ -107,5 +125,6 @@ fn main() {
         .caption("GeoJSON Map", ("sans-serif", 50).into_font())
         .build_cartesian_2d(-180.0..180.0, -90.0..90.0)
         .unwrap();
+
     chart.configure_mesh().draw().unwrap();
 }
